@@ -61,7 +61,7 @@ class PrintRetrievalHandler(BaseCallbackHandler):
 
     def on_retriever_end(self, documents, **kwargs):
         # self.container.write(documents)
-        for idx, doc in enumerate(documents):
+        for doc in documents:
             source = doc.metadata["source"]
             self.container.write(f"**Results from {source}**")
             self.container.text(doc.page_content)
@@ -78,15 +78,11 @@ if 'retriever' not in st.session_state:
 web_retriever = st.session_state.retriever
 llm = st.session_state.llm
 
-# User input 
-question = st.text_input("`Ask a question:`")
-
-if question:
-
+if question := st.text_input("`Ask a question:`"):
     # Generate answer (w/ citations)
     import logging
     logging.basicConfig()
-    logging.getLogger("langchain.retrievers.web_research").setLevel(logging.INFO)    
+    logging.getLogger("langchain.retrievers.web_research").setLevel(logging.INFO)
     qa_chain = RetrievalQAWithSourcesChain.from_chain_type(llm, retriever=web_retriever)
 
     # Write answer and sources
